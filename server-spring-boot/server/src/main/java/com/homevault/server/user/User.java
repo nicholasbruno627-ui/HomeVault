@@ -20,7 +20,6 @@ public class User {
   @Column(nullable = false, length = 100)
   private String displayName;
 
-  //stores argon2 hash, not actual password
   @Column(nullable = false, length = 255)
   private String passwordHash;
 
