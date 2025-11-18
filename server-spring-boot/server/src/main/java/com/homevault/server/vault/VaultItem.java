@@ -1,48 +1,84 @@
 package com.homevault.server.vault;
 
 import com.homevault.server.crypto.EncryptedPayload;
+import com.homevault.server.user.User;
 import jakarta.persistence.*;
+
 import java.util.UUID;
 
-@Entity// directly maps to DB table
-@Table(name = "vault_items")
+@Entity
+@Table(
+    name = "vault_items",
+    indexes = {
+        @Index(name = "ix_vault_items_owner", columnList = "owner_id")
+    }
+)
 public class VaultItem {
 
-  @Id
-  @GeneratedValue
-  private UUID id;
+    @Id
+    @GeneratedValue
+    private UUID id;
 
-  @Column(nullable = false)
-  private String title;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
-  @Column(nullable = false)
-  private String username;
+    @Column(nullable = false, length = 255)
+    private String title;
 
-  @Embedded
-  private EncryptedPayload payload;
+    @Column(nullable = false, length = 255)
+    private String username;
 
-  @Transient
-  private String plaintextSecret; //not persisted, only exits in memory during runtime. stores plain-text password but never saved
+    @Embedded
+    private EncryptedPayload payload;
 
-  public VaultItem() {} //default contructor
+   
 
-  public VaultItem(String title, String username) {
-    this.title = title;
-    this.username = username;
-  }
-  
-  //getters and setters
-  public UUID getId() { return id; }
+    protected VaultItem() {
+    }
 
-  public String getTitle() { return title; }
-  public void setTitle(String title) { this.title = title; }
+    public VaultItem(User owner, String title, String username, EncryptedPayload payload) {
+        this.owner = owner;
+        this.title = title;
+        this.username = username;
+        this.payload = payload;
+    }
 
-  public String getUsername() { return username; }
-  public void setUsername(String username) { this.username = username; }
+    //getters and setters
 
-  public EncryptedPayload getPayload() { return payload; }
-  public void setPayload(EncryptedPayload payload) { this.payload = payload; }
+    public UUID getId() {
+        return id;
+    }
 
-  public String getPlaintextSecret() { return plaintextSecret; }
-  public void setPlaintextSecret(String plaintextSecret) { this.plaintextSecret = plaintextSecret; }
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public EncryptedPayload getPayload() {
+        return payload;
+    }
+
+    public void setPayload(EncryptedPayload payload) {
+        this.payload = payload;
+    }
 }
