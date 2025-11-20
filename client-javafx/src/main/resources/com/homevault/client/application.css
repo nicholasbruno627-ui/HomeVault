@@ -1,0 +1,152 @@
+/* whole app */
+
+.root {
+    -fx-background-color: #f3f4f6;        /* light gray */
+    -fx-font-family: "Segoe UI", "Roboto", "Sans-Serif";
+    -fx-text-fill: #111827;
+}
+
+/* default labels */
+.label {
+    -fx-text-fill: #111827;
+}
+
+/* small status/footer labels */
+#statusLabel {
+    -fx-text-fill: #4b5563;
+}
+
+/* buttons */
+
+.button {
+    -fx-background-color: #2563eb;        
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 7 16 7 16;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.button:pressed {
+    -fx-background-color: #1e40af;
+}
+
+/* (toolbar buttons) */
+.toolbar-button {
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #111827;
+    -fx-font-weight: normal;
+}
+
+.toolbar-button:hover {
+    -fx-background-color: #d1d5db;
+}
+
+/* text/password field */
+
+.text-field,
+.password-field {
+    -fx-background-color: white;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused,
+.password-field:focused {
+    -fx-border-color: #2563eb;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.25), 6, 0.2, 0, 0);
+}
+
+/* tables in dashboard*/
+
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 4;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #e5e7eb;
+    -fx-background-radius: 6 6 0 0;
+}
+
+.table-view .column-header, 
+.table-view .filler {
+    -fx-border-color: transparent transparent #d1d5db transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 6 8 6 8;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.table-row-cell {
+    -fx-cell-size: 28px;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f9fafb;
+}
+
+.table-row-cell:even {
+    -fx-background-color: white;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #111827;
+}
+
+/* add/edit, backup/restore)  */
+
+.dialog-pane {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.dialog-pane > .content.label {
+    -fx-padding: 10;
+}
+
+.dialog-pane .button {
+    -fx-min-width: 70;
+}
+
+/* titled pane(still in work, serves as drop down menu) */
+
+.titled-pane {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #d1d5db;
+    -fx-background-color: white;
+}
+
+.titled-pane > .title {
+    -fx-background-color: #e5e7eb;
+    -fx-padding: 6 10 6 10;
+}
+
+.titled-pane > *.content {
+    -fx-background-color: white;
+    -fx-padding: 8 10 10 10;
+}
+
+/*(dashboard header*/
+
+.hbox {
+    -fx-spacing: 8;
+}

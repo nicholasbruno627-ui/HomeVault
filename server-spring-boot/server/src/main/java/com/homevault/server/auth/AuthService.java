@@ -2,75 +2,56 @@ package com.homevault.server.auth;
 
 import com.homevault.server.user.User;
 import com.homevault.server.user.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Objects;
 
 @Service
 public class AuthService {
 
-  private final UserRepository users;
-  private final JWTService jwt;
+    private final UserRepository users;
 
-  public AuthService(UserRepository users, JWTService jwt) {
-    this.users = users;
-    this.jwt = jwt;
-  }
-
-  @Transactional
-  public AuthResponse register(RegisterRequest req) {
-    if (req.getEmail() == null || req.getPassword() == null || req.getName() == null) {
-      throw new AuthException("Missing required fields");
+    public AuthService(UserRepository users) {
+        this.users = users;
     }
 
-    String email = req.getEmail().trim().toLowerCase();
-    String displayName = req.getName().trim();
-    String password = req.getPassword(); // plain text for demo
+    public AuthResponse register(RegisterRequest req) {
+        //if email already used, error
+        if (users.findByEmail(req.getEmail()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
+        }
 
-    users.findByEmailIgnoreCase(email).ifPresent(u -> {
-      throw new AuthException("Email already in use");
-    });
+        User u = new User();
+        u.setEmail(req.getEmail());
+        //password hash
+        u.setPasswordHash(req.getPassword());
+        u.setDisplayName(req.getDisplayName());
 
-    User u = new User();
-    u.setEmail(email);
-    u.setDisplayName(displayName);
-    u.setPasswordHash(password);
+        u = users.save(u);
 
-    User saved = users.save(u);
-
-    String token = jwt.generateToken(saved.getId(), saved.getEmail(), saved.getDisplayName());
-
-    return new AuthResponse(
-        saved.getId(),
-        saved.getEmail(),
-        saved.getDisplayName(),
-        token
-    );
-  }
-
-  @Transactional(readOnly = true)
-  public AuthResponse login(LoginRequest req) {
-    if (req.getEmail() == null || req.getPassword() == null) {
-      throw new AuthException("Missing credentials");
+        AuthResponse resp = new AuthResponse();
+        resp.setUserId(u.getId());
+        resp.setEmail(u.getEmail());
+        resp.setDisplayName(u.getDisplayName());
+        return resp;
     }
 
-    String email = req.getEmail().trim().toLowerCase();
-    String password = req.getPassword();
+    public AuthResponse login(LoginRequest req) {
+        User u = users.findByEmail(req.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "Invalid credentials"));
 
-    User u = users
-        .findByEmailIgnoreCase(email)
-        .orElseThrow(() -> new AuthException("Invalid credentials"));
+        //compare plain passwords to hashed password
+        if (!Objects.equals(u.getPasswordHash(), req.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        }
 
-    if (!password.equals(u.getPasswordHash())) {
-      throw new AuthException("Invalid credentials");
+        AuthResponse resp = new AuthResponse();
+        resp.setUserId(u.getId());
+        resp.setEmail(u.getEmail());
+        resp.setDisplayName(u.getDisplayName());
+        return resp;
     }
-
-    String token = jwt.generateToken(u.getId(), u.getEmail(), u.getDisplayName());
-
-    return new AuthResponse(
-        u.getId(),
-        u.getEmail(),
-        u.getDisplayName(),
-        token
-    );
-  }
 }

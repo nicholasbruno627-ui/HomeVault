@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.homevault.client.backup.BackupDialogController">
+    <content>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label text="Backup & Restore" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+
+            <TitledPane text="Create Backup" expanded="true">
+                <VBox spacing="10" padding="10">
+                    <Label text="Create a secure backup of your vault stored on the server."/>
+                    <Button text="Create Backup Now" onAction="#onCreateBackup"/>
+                </VBox>
+            </TitledPane>
+
+            <TitledPane text="Restore Backup" expanded="false">
+                <VBox spacing="10" padding="10">
+                    <Label text="Restore from the latest backup entry."/>
+                    <Button text="Restore Latest Backup" onAction="#onRestoreBackup"/>
+                </VBox>
+            </TitledPane>
+
+            <Label fx:id="statusLabel" wrapText="true"/>
+        </VBox>
+    </content>
+
+    <buttonTypes>
+        <ButtonType fx:constant="CLOSE"/>
+    </buttonTypes>
+</DialogPane>

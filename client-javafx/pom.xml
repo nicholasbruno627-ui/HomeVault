@@ -13,7 +13,7 @@
     <maven.compiler.release>21</maven.compiler.release>
     <javafx.version>21.0.3</javafx.version>
   </properties>
-
+  
   <dependencies>
     <dependency>
       <groupId>org.openjfx</groupId>
@@ -21,6 +21,11 @@
       <version>${javafx.version}</version>
     </dependency>
     <dependency>
+    	<groupId>org.json</groupId>
+    	<artifactId>json</artifactId>
+    	<version>20231013</version>
+	</dependency>
+	<dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
       <version>${javafx.version}</version>

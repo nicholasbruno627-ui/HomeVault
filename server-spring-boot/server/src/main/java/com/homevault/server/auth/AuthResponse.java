@@ -3,32 +3,16 @@ package com.homevault.server.auth;
 import java.util.UUID;
 
 public class AuthResponse {
-
     private UUID userId;
     private String email;
-    private String name;
-    private String token;
+    private String displayName;
 
-    public AuthResponse(UUID userId, String email, String name, String token) {
-        this.userId = userId;
-        this.email = email;
-        this.name = name;
-        this.token = token;
-    }
+    public UUID getUserId() { return userId; }
+    public void setUserId(UUID userId) { this.userId = userId; }
 
-    public UUID getUserId() {
-        return userId;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getToken() {
-        return token;
-    }
+    public String getDisplayName() { return displayName; }
+    public void setDisplayName(String displayName) { this.displayName = displayName; }
 }

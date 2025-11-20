@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.homevault.client.vault.DashboardController">
+
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Label text="Vault Items" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button text="Backup / Restore" />
+            <Button text="Logout" onAction="#onLogout"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <HBox spacing="5">
+                <TextField fx:id="searchField" promptText="Search..." HBox.hgrow="ALWAYS"/>
+                <Button text="Add" onAction="#onAddItem"/>
+                <Button text="Edit" onAction="#onEditItem"/>
+                <Button text="Delete" onAction="#onDeleteItem"/>
+            </HBox>
+
+            <TableView fx:id="vaultTable" prefHeight="400">
+                <columns>
+                    <TableColumn fx:id="titleCol" text="Title" prefWidth="200"/>
+                    <TableColumn fx:id="usernameCol" text="Username" prefWidth="200"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+
+    <bottom>
+    	<Label fx:id="statusLabel">
+        	<padding>
+            	<Insets top="10" right="10" bottom="10" left="10"/>
+        	</padding>
+    	</Label>
+	</bottom>
+
+</BorderPane>

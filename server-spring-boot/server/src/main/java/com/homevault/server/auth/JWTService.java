@@ -1,4 +1,4 @@
-//need to test
+//****need to test and get functionality***
 package com.homevault.server.auth;
 
 import com.auth0.jwt.JWT;
@@ -38,7 +38,7 @@ public class JWTService {
         .withExpiresAt(Date.from(exp))
         .sign(algorithm);
   }
-
+  
   public DecodedJWT verify(String token) {
     return JWT.require(algorithm).build().verify(token);
   }

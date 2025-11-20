@@ -1,4 +1,3 @@
-// AuthException.java
 package com.homevault.server.auth;
 
 import org.springframework.http.HttpStatus;
