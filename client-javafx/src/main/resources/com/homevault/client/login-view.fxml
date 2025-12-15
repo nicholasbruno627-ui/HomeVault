@@ -19,6 +19,9 @@
 
             <Button text="Login" onAction="#onLoginClicked" maxWidth="250"/>
 
+			<Button text="Create Account" onAction="#onGoToRegister"/>
+
+			
             <Label fx:id="errorLabel" textFill="red" wrapText="true" maxWidth="250"/>
         </VBox>
     </center>

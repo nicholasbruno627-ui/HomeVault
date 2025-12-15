@@ -2,41 +2,43 @@ package com.homevault.client.service;
 
 import java.util.UUID;
 
-
 public class AuthSession {
 
-    private static AuthSession instance;
+    private static AuthSession instance = new AuthSession();
 
     private UUID userId;
-    private String email;
+    private String token;
 
     private AuthSession() {}
 
     public static AuthSession getInstance() {
-        if (instance == null) {
-            instance = new AuthSession();
-        }
         return instance;
     }
 
-   
-    public void login(UUID userId, String email) {
-        this.userId = userId;
-        this.email = email;
-    }
+    //getters
 
-   
     public UUID getUserId() {
         return userId;
     }
 
-    public String getEmail() {
-        return email;
+    public String getToken() {
+        return token;
     }
 
-   
-    public void logout() {
+    //setters
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    //logs out the user on the client side, resets apps memory so user isn't authenticated anymore
+
+    public void clear() {
         this.userId = null;
-        this.email = null;
+        this.token = null;
     }
 }

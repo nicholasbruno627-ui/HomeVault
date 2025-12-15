@@ -1,61 +1,76 @@
 package com.homevault.server.vault;
 
 import com.homevault.server.crypto.EncryptedPayload;
-import com.homevault.server.user.User;
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(
-    name = "vault_items",
-    indexes = {
-        @Index(name = "ix_vault_items_owner", columnList = "owner_id")
-    }
-)
+@Table(name = "vault_items")
 public class VaultItem {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, length = 200)
     private String title;
 
-    @Column(nullable = false, length = 255)
-    private String username;
+    @Column(name = "login_username", length = 255)
+    private String loginUsername;
 
     @Embedded
     private EncryptedPayload payload;
 
-   
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
-    protected VaultItem() {
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
+    public VaultItem() {
+        // JPA
     }
 
-    public VaultItem(User owner, String title, String username, EncryptedPayload payload) {
-        this.owner = owner;
-        this.title = title;
-        this.username = username;
-        this.payload = payload;
+    @PrePersist
+    public void onCreate() {
+        Instant now = Instant.now();
+        createdAt = now;
+        updatedAt = now;
+
+        if (payload != null) {
+            payload.ensureAlgDefault("AES_GCM_256");
+        }
     }
 
-    //getters and setters
+    @PreUpdate
+    public void onUpdate() {
+        updatedAt = Instant.now();
+        if (payload != null) {
+            payload.ensureAlgDefault("AES_GCM_256");
+        }
+    }
+
+    //getters / setters
 
     public UUID getId() {
         return id;
     }
 
-    public User getOwner() {
-        return owner;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 
     public String getTitle() {
@@ -66,12 +81,12 @@ public class VaultItem {
         this.title = title;
     }
 
-    public String getUsername() {
-        return username;
+    public String getLoginUsername() {
+        return loginUsername;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLoginUsername(String loginUsername) {
+        this.loginUsername = loginUsername;
     }
 
     public EncryptedPayload getPayload() {
@@ -80,5 +95,17 @@ public class VaultItem {
 
     public void setPayload(EncryptedPayload payload) {
         this.payload = payload;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

@@ -1,57 +1,87 @@
-//****need to test and get functionality***
 package com.homevault.server.auth;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import org.springframework.beans.factory.annotation.Value;
+import com.homevault.server.user.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.security.Key;
 import java.util.Date;
-import java.util.UUID;
+import java.util.function.Function;
 
 @Service
 public class JWTService {
 
-  private final Algorithm algorithm;
-  private final long expirationMinutes;
+	//secret key
+    private static final String SECRET_KEY = "gG93Fv0*C19k@5!pQ7s$D3r9Jf82LmXwZcVbErTnFhPgQwXeRsTyUiOpAsDfGhJ";
 
-  public JWTService(
-      @Value("${homevault.jwt.secret}") String secret,
-      @Value("${homevault.jwt.exp-minutes}") long expirationMinutes
-  ) {
-    this.algorithm = Algorithm.HMAC256(secret);
-    this.expirationMinutes = expirationMinutes;
-  }
+    //HMAC-SHA hash
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    }
 
-  public String generateToken(UUID userId, String email, String displayName) {
-    Instant now = Instant.now();
-    Instant exp = now.plus(expirationMinutes, ChronoUnit.MINUTES);
+    //generate JWT for current user
+    public String generateToken(User user) {
+        long now = System.currentTimeMillis();
+        long expiry = now + 1000L * 60 * 60 * 24; //token expires in 24 hours
 
-    return JWT.create()
-        .withSubject(userId.toString())
-        .withClaim("email", email)
-        .withClaim("name", displayName)
-        .withIssuedAt(Date.from(now))
-        .withExpiresAt(Date.from(exp))
-        .sign(algorithm);
-  }
-  
-  public DecodedJWT verify(String token) {
-    return JWT.require(algorithm).build().verify(token);
-  }
+        return Jwts.builder()
+                //store the user's ID as the subject
+                .setSubject(user.getId().toString())
+                //store email inside the token
+                .claim("email", user.getEmail())
+                //store display name inside the token
+                .claim("displayName", user.getDisplayName())
+                //issued at timestamp
+                .setIssuedAt(new Date(now))
+                //expiration timestamp
+                .setExpiration(new Date(expiry))
+                //token is signed with HMAC-SHA256 string
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                //builds final JWT string
+                .compact();
+    }
 
-  public UUID getUserId(DecodedJWT jwt) {
-    return UUID.fromString(jwt.getSubject());
-  }
+    
+    public String extractUserId(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
 
-  public String getEmail(DecodedJWT jwt) {
-    return jwt.getClaim("email").asString();
-  }
+    
+    public <T> T extractClaim(String token, Function<Claims, T> resolver) {
+        //parse the JWT and validate its signature using signing key
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        //gets everything inside JWT token
+        return resolver.apply(claims);
+    }
 
-  public String getName(DecodedJWT jwt) {
-    return jwt.getClaim("name").asString();
-  }
+    
+    public boolean isTokenValid(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            //token is valid only if its expiration time is after current time
+            return claims.getExpiration().after(new Date());
+        } catch (Exception ex) {
+            //any exception means invalid token
+            return false;
+        }
+    }
+
+   
+    public String extractEmail(String token) {
+        //use the generic extractClaim helper and casts the "email" claim to a string
+        return extractClaim(token, claims -> claims.get("email", String.class));
+    }
+
 }

@@ -1,33 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.homevault.client.vault.VaultItemDialogController">
-    <content>
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.homevault.client.vault.VaultItemController"
+      spacing="10">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <children>
+
+        <!-- Form fields -->
         <GridPane hgap="10" vgap="10">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
+            <columnConstraints>
+                <ColumnConstraints minWidth="80" halignment="RIGHT"/>
+                <ColumnConstraints minWidth="200" hgrow="ALWAYS"/>
+            </columnConstraints>
 
-            <Label text="Title:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <TextField fx:id="titleField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <children>
+                <Label text="Title:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="titleField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-            <Label text="Username:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-            <TextField fx:id="usernameField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label text="Username:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <TextField fx:id="usernameField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-            <Label text="Password / Secret:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-            <PasswordField fx:id="secretField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-
-            <Label fx:id="errorLabel" textFill="red" GridPane.rowIndex="3" GridPane.columnIndex="0"
-                   GridPane.columnSpan="2"/>
+                <Label text="Secret:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <TextField fx:id="secretField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            </children>
         </GridPane>
-    </content>
 
-    <buttonTypes>
-        <ButtonType fx:constant="OK_DONE"/>
-        <ButtonType fx:constant="CANCEL_CLOSE"/>
-    </buttonTypes>
-</DialogPane>
+        <!-- Save button row -->
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button fx:id="saveButton"
+                    text="Save"
+                    onAction="#onSaveClicked"/>
+        </HBox>
+
+    </children>
+</VBox>

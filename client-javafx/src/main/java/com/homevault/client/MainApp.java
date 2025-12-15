@@ -17,18 +17,18 @@ public class MainApp extends Application {
         showLogin();
     }
 
-    
+    // Generic scene loader used by all screens
     private static void loadScene(String fxmlFile, int width, int height) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                MainApp.class.getResource("/com/homevault/client/" + fxmlFile)
+                    MainApp.class.getResource("/com/homevault/client/" + fxmlFile)
             );
 
             Scene scene = new Scene(loader.load(), width, height);
 
             scene.getStylesheets().add(
-                MainApp.class.getResource("/com/homevault/client/application.css")
-                    .toExternalForm()
+                    MainApp.class.getResource("/com/homevault/client/application.css")
+                            .toExternalForm()
             );
 
             primaryStage.setScene(scene);
@@ -38,12 +38,14 @@ public class MainApp extends Application {
         }
     }
 
-    
     public static void showLogin() {
         loadScene("login-view.fxml", 380, 420);
     }
 
-    
+    public static void showRegister() {
+        loadScene("register-view.fxml", 380, 420);
+    }
+
     public static void showDashboard() {
         loadScene("dashboard-view.fxml", 900, 600);
     }

@@ -1,35 +1,55 @@
 package com.homevault.server.auth;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin //allows javafx to call the auth controller
 public class AuthController {
 
-  private final AuthService auth;
+    private final AuthService authService;
 
-  public AuthController(AuthService auth) {
-    this.auth = auth;
-  }
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
-  @PostMapping("/register")
-  public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-    AuthResponse resp = auth.register(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(resp);
-  }
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+            AuthResponse response = authService.register(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            // error such as “Email already in use”
+            Map<String, Object> body = new HashMap<>();
+            body.put("error", ex.getMessage());
+            return ResponseEntity.badRequest().body(body);
+        } catch (Exception ex) {
+            ex.printStackTrace(); //log to console
+            Map<String, Object> body = new HashMap<>();
+            body.put("error", "Unexpected server error");
+            body.put("details", ex.getClass().getSimpleName() + ": " + ex.getMessage());
+            return ResponseEntity.status(500).body(body);
+        }
+    }
 
-  @PostMapping("/login")
-  public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-    AuthResponse resp = auth.login(request);
-    return ResponseEntity.ok(resp);
-  }
-
-  //test /me
-  @GetMapping("/me")
-  public ResponseEntity<String> me() {
-    return ResponseEntity.ok("Auth is not using sessions/tokens right now.");
-  }
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            AuthResponse response = authService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("error", ex.getMessage());
+            return ResponseEntity.status(401).body(body);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Map<String, Object> body = new HashMap<>();
+            body.put("error", "Unexpected server error");
+            body.put("details", ex.getClass().getSimpleName() + ": " + ex.getMessage());
+            return ResponseEntity.status(500).body(body);
+        }
+    }
 }

@@ -16,51 +16,74 @@ public class VaultItemController {
     @FXML private TextField secretField;
     @FXML private Button saveButton;
 
+    //item being edited
     private VaultItemModel editingItem;
+
+    //refreshes table
     private Runnable refreshCallback;
 
-    private final ApiClient api = new ApiClient();
+    //current user ID from session
     private final UUID userId = AuthSession.getInstance().getUserId();
 
+    //called by DashboardController after FXML load
     public void setItem(VaultItemModel item) {
         this.editingItem = item;
+
         if (item != null) {
+            // populate fields for editing
             titleField.setText(item.getTitle());
             usernameField.setText(item.getUsername());
             secretField.setText(item.getSecret());
         }
     }
 
-    public void setRefreshCallback(Runnable callback) {
-        this.refreshCallback = callback;
+    //called by DashboardController after FXML load
+    public void setRefreshCallback(Runnable refreshCallback) {
+        this.refreshCallback = refreshCallback;
     }
 
+    //called when Save button is clicked (onAction="#onSaveClicked")
     @FXML
-    private void onSave() {
-        String title = titleField.getText();
-        String username = usernameField.getText();
-        String secret = secretField.getText();
+    private void onSaveClicked() {
+        String title = titleField.getText() != null ? titleField.getText().trim() : "";
+        String username = usernameField.getText() != null ? usernameField.getText().trim() : "";
+        String secret = secretField.getText() != null ? secretField.getText().trim() : "";
 
-        if (editingItem == null) {
-            // create new
-            api.createVaultItem(userId, title, username, secret);
-        } else {
-            // update
-            api.updateVaultItem(userId, editingItem.getId(), title, username, secret);
+        //requires title
+        if (title.isEmpty()) {
+            return;
         }
 
-        if (refreshCallback != null) refreshCallback.run();
+        try {
+            if (editingItem == null) {
+                //adding new item
+                VaultItemModel model = new VaultItemModel();
+                model.setTitle(title);
+                model.setUsername(username);
+                model.setSecret(secret);
 
-        closeWindow();
-    }
+                ApiClient.createVaultItem(userId, model);
 
-    @FXML
-    private void onCancel() {
-        closeWindow();
-    }
+            } else {
+                //editing existing item
+                editingItem.setTitle(title);
+                editingItem.setUsername(username);
+                editingItem.setSecret(secret);
 
-    private void closeWindow() {
-        Stage stage = (Stage) saveButton.getScene().getWindow();
-        stage.close();
+                ApiClient.updateVaultItem(editingItem.getId(), editingItem);
+            }
+
+            //asks dashboard to refresh the table
+            if (refreshCallback != null) {
+                refreshCallback.run();
+            }
+
+            //close the window
+            Stage stage = (Stage) saveButton.getScene().getWindow();
+            stage.close();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

@@ -2,56 +2,61 @@ package com.homevault.server.auth;
 
 import com.homevault.server.user.User;
 import com.homevault.server.user.UserRepository;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Objects;
 
 @Service
 public class AuthService {
 
-    private final UserRepository users;
+    @Autowired
+    private UserRepository userRepository;
 
-    public AuthService(UserRepository users) {
-        this.users = users;
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    public AuthResponse register(RegisterRequest req) {
-        //if email already used, error
-        if (users.findByEmail(req.getEmail()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
+    @Autowired
+    private JWTService jwtService;
+
+    public AuthResponse register(RegisterRequest request) {
+
+        if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
+            throw new IllegalArgumentException("Email already in use");
         }
 
-        User u = new User();
-        u.setEmail(req.getEmail());
-        //password hash
-        u.setPasswordHash(req.getPassword());
-        u.setDisplayName(req.getDisplayName());
+        User user = new User();
+        user.setEmail(request.getEmail().trim().toLowerCase());
+        user.setDisplayName(request.getDisplayName().trim());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
-        u = users.save(u);
+        userRepository.save(user);
 
-        AuthResponse resp = new AuthResponse();
-        resp.setUserId(u.getId());
-        resp.setEmail(u.getEmail());
-        resp.setDisplayName(u.getDisplayName());
-        return resp;
+        String token = jwtService.generateToken(user);
+
+        return new AuthResponse(
+                token,
+                user.getId(),
+                user.getEmail(),
+                user.getDisplayName()
+        );
     }
 
-    public AuthResponse login(LoginRequest req) {
-        User u = users.findByEmail(req.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+    public AuthResponse login(LoginRequest request) {
 
-        //compare plain passwords to hashed password
-        if (!Objects.equals(u.getPasswordHash(), req.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        User user = userRepository.findByEmailIgnoreCase(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("Invalid email or password");
         }
 
-        AuthResponse resp = new AuthResponse();
-        resp.setUserId(u.getId());
-        resp.setEmail(u.getEmail());
-        resp.setDisplayName(u.getDisplayName());
-        return resp;
+        String token = jwtService.generateToken(user);
+
+        return new AuthResponse(
+                token,
+                user.getId(),
+                user.getEmail(),
+                user.getDisplayName()
+        );
     }
 }
