@@ -20,20 +20,20 @@ public class VaultItemController {
         this.vaultItemService = vaultItemService;
     }
 
-    // GET /api/vault?userId=...
+   
     @GetMapping
     public List<VaultItemResponse> list(@RequestParam("userId") UUID userId) {
         return vaultItemService.listItemsForUser(userId);
     }
 
-    // POST /api/vault?userId=...
+    
     @PostMapping
     public VaultItemResponse create(@RequestParam("userId") UUID userId,
                                     @RequestBody VaultItemCreateRequest request) {
         return vaultItemService.createVaultItem(userId, request);
     }
 
-    // PUT /api/vault/{id}?userId=...
+
     @PutMapping("/{id}")
     public VaultItemResponse update(@PathVariable("id") UUID id,
                                     @RequestParam("userId") UUID userId,
@@ -41,16 +41,14 @@ public class VaultItemController {
         return vaultItemService.updateVaultItem(userId, id, request);
     }
 
-    // DELETE /api/vault/{id}?userId=...
+    
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") UUID id,
                        @RequestParam("userId") UUID userId) {
         vaultItemService.deleteItem(userId, id);
     }
 
-    // ---------------------------------------------------------
-    // NEW ENDPOINT: RETURN DECRYPTED SECRET FOR AN ITEM
-    // ---------------------------------------------------------
+   
     @GetMapping("/{id}/secret")
     public Map<String, String> getSecret(@PathVariable("id") UUID itemId) {
 

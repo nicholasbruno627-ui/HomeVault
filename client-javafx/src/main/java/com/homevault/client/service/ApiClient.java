@@ -85,15 +85,23 @@ public class ApiClient {
         int status = conn.getResponseCode();
         String response = readBody(status, conn);
 
+     
+        if (status == HttpURLConnection.HTTP_CONFLICT ||
+            (response != null && response.toLowerCase().contains("email"))) {
+
+            throw new IOException("Email already exists");
+        }
+
         if (status != HttpURLConnection.HTTP_OK &&
             status != HttpURLConnection.HTTP_CREATED) {
 
-            throw new IOException("Registration failed: " + response);
+            throw new IOException("Registration failed");
         }
 
         System.out.println("Register response: " + response);
+        
+        
     }
-
 
 
     
@@ -266,11 +274,7 @@ public class ApiClient {
         }
     }
 
-    // ========================================================
-    // PARSERS
-    // ========================================================
-
-    // ---- VAULT ITEM LIST PARSER ----
+    //parsers
     private static List<VaultItemModel> parseVaultItems(String json) {
 
         List<VaultItemModel> list = new ArrayList<>();
@@ -283,11 +287,10 @@ public class ApiClient {
             return list;
         }
 
-        // strip brackets
+       
         String inner = json.substring(1, json.length() - 1).trim();
         if (inner.isEmpty()) return list;
 
-        // split by "},{"
         String[] objects = inner.split("\\},\\{");
 
         for (String obj : objects) {
@@ -317,9 +320,7 @@ public class ApiClient {
         return new ArrayList<>();
     }
 
-    // ========================================================
-    // HELPER METHODS
-    // ========================================================
+  
     private static HttpURLConnection openAuthorizedConnection(String urlStr, String method) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

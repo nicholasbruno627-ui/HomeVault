@@ -22,6 +22,11 @@
     <TextField fx:id="displayNameField" promptText="Display Name" />
     <PasswordField fx:id="passwordField" promptText="Password" />
 
+	<Label fx:id="errorLabel"
+       textFill="RED"
+       visible="false"
+       wrapText="true"/>
+	
     <Button fx:id="registerButton" text="Register" onAction="#onRegisterClicked" style="-fx-padding: 8 18;"/>
 
     <Button text="Back to Login" onAction="#onBackToLogin" style="-fx-padding: 6 12;"/>
