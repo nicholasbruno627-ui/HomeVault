@@ -20,18 +20,25 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
             AuthResponse response = authService.register(request);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(201).body(response);
+
         } catch (IllegalArgumentException ex) {
-            // error such as “Email already in use”
-            Map<String, Object> body = new HashMap<>();
-            body.put("error", ex.getMessage());
-            return ResponseEntity.badRequest().body(body);
+
+            if (ex.getMessage().toLowerCase().contains("email")) {
+                return ResponseEntity
+                        .status(409)
+                        .body(Map.of("error", "Email already exists"));
+            }
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", ex.getMessage()));
+
         } catch (Exception ex) {
-            ex.printStackTrace(); //log to console
-            Map<String, Object> body = new HashMap<>();
-            body.put("error", "Unexpected server error");
-            body.put("details", ex.getClass().getSimpleName() + ": " + ex.getMessage());
-            return ResponseEntity.status(500).body(body);
+            ex.printStackTrace();
+            return ResponseEntity
+                    .status(500)
+                    .body(Map.of("error", "Unexpected server error"));
         }
     }
 

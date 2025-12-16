@@ -64,6 +64,7 @@ public class ApiClient {
     }
     
     public static void register(String email, String displayName, String password) throws IOException {
+
         String endpoint = BASE_URL + "/auth/register";
         URL url = new URL(endpoint);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -85,23 +86,23 @@ public class ApiClient {
         int status = conn.getResponseCode();
         String response = readBody(status, conn);
 
-     
-        if (status == HttpURLConnection.HTTP_CONFLICT ||
-            (response != null && response.toLowerCase().contains("email"))) {
+        System.out.println("REGISTER STATUS = " + status);
+        System.out.println("REGISTER BODY = " + response);
 
+        
+        if (status == HttpURLConnection.HTTP_CONFLICT) {
             throw new IOException("Email already exists");
         }
 
+        
         if (status != HttpURLConnection.HTTP_OK &&
             status != HttpURLConnection.HTTP_CREATED) {
-
             throw new IOException("Registration failed");
         }
 
-        System.out.println("Register response: " + response);
-        
         
     }
+
 
 
     
